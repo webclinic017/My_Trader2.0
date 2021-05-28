@@ -36,7 +36,7 @@ from bs4 import BeautifulSoup as bs
 # import pandas_datareader as da
 from tqdm import tqdm
 from IPython.display import clear_output
-import backtrader as bt
+# import backtrader as bt
 import urllib.request, urllib.error, urllib.parse
 # import datetools 
 # import multiprocessing

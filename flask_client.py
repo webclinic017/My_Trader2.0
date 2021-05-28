@@ -500,7 +500,10 @@ def my_trading_param():
           rsi_sell = trading_param["rsi_sell"],
           strategy_cutloss = trading_param["strategy_cutloss"],
           strategy_harvest = trading_param["strategy_harvest"],
-          strategy_timeout_days = trading_param["strategy_timeout_days"]
+          strategy_timeout_days = trading_param["strategy_timeout_days"],
+          fundamental_money = trading_param["fundamental_money"],
+          fundamental_harvest = trading_param["fundamental_harvest"],
+          fundamental_harvest_prop = trading_param["fundamental_harvest_prop"],
                              
                              )
 
@@ -553,6 +556,12 @@ def set_trading_param():
         trading_param["strategy_harvest"]=float(fl.request.form["strategy_harvest"])
 
         trading_param["strategy_timeout_days"]=float(fl.request.form["strategy_timeout_days"])
+        
+        trading_param["fundamental_money"]=float(fl.request.form["fundamental_money"])
+
+        trading_param["fundamental_harvest"]=float(fl.request.form["fundamental_harvest"])
+        
+        trading_param["fundamental_harvest_prop"]=float(fl.request.form["fundamental_harvest_prop"])
         
         with open(directory + 'trading_param.json', 'w') as outfile:
             json.dump(trading_param, outfile)

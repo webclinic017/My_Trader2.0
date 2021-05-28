@@ -112,7 +112,7 @@ class future ():
 
         options = se.FirefoxOptions()
         options.add_argument("--headless")
-        driver = se.Firefox(executable_path=home_dir + "/notebook/My_Trader2.0/geckodriver.exe", options=options)
+        driver = se.Firefox(executable_path=home_dir + "/notebook/My_Trader2.0/geckodriver", options=options)
 
         driver.set_window_size(2100, 4000)
 

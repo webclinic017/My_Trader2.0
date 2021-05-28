@@ -121,9 +121,9 @@ def log_trade(ticker,size, price, strategy , hold_days = None, database = "trade
     timestamp = datetime.now()
     mongod = mongo(database,ticker)
     if hold_days == None:
-        upload_data = pd.DataFrame([{"TimeStamp":timestamp, "Ticker":ticker,"size":size,"Price":price,"Strategy":strategy}])
+        upload_data = pd.DataFrame([{"TimeStamp":timestamp, "Ticker":ticker,"size":size,"raw_size":size,"Price":price,"Strategy":strategy}])
     else:
-        upload_data = pd.DataFrame([{"TimeStamp":timestamp, "Ticker":ticker,"size":size,"Price":price,"Strategy":strategy, "Hold_days":hold_days}])
+        upload_data = pd.DataFrame([{"TimeStamp":timestamp, "Ticker":ticker,"size":size,"raw_size":size,"Price":price,"Strategy":strategy, "Hold_days":hold_days}])
     
     mongod.conn.frame_to_mongo(upload_data)
 

@@ -5,7 +5,7 @@ from .mysql import *
 from .pyfin import *
 from .Robinhood import *
 from .send_email import *
-from .ta_strategies import *
+# from .ta_strategies import *
 from .future import *
 from .option import *
 from .fmp import *

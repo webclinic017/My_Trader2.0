@@ -27,7 +27,7 @@ try:
 
     strategy_name = "Fundamental"
 
-    money = 500
+    money = trading_param["fundamental_money"]
 
     mongod = mongo("all_symbol")
 
@@ -80,15 +80,15 @@ try:
         if len(log) == 0:
             continue
         quote = realtimequote(i).price.iloc[0]
-        size = np.ceil(log["size"].iloc[-1]/3)
+        size = np.ceil(log["size"].iloc[-1]*trading_param["fundamental_harvest_prop"])
         try:
             cost = robinhood.get_average_cost(i)
         except:
             send_email("%s not in portfolio"%i)
             continue
-        if (quote - cost)/cost > 0.08:
+        if (quote - cost)/cost > trading_param["fundamental_harvest"]:
             if robinhood.place_sell_bulk_checkup(ticker_list=[i],quantity_list=[size])== "Trade Success!":
-                log_trade(i,-log["size"].sum(), robinhood.get_last_price(i), strategy_name)
+                log_trade(i,-size, robinhood.get_last_price(i), strategy_name)
                 send_email("Fundamental Cumulation Sell: %s"%i)
 
 ########################################################
