@@ -20,6 +20,41 @@ from my_libs_py3 import *
 #     send_email(body_html="",body_content="", title = str(e) +" daily price update error") 
     
     
+    
+    
+########################   
+# Fix unsetteled trade
+########################
+robinhood = robingateway()
+
+
+
+try:
+
+    log_pos = get_open_opsition()
+    temp = robinhood.get_my_positions()
+    pos_frame = pd.DataFrame([temp[0],temp[1]]).transpose()
+    pos_frame.columns = ["Ticker","Shares"]
+    #     act_pos = robinhood.get_my_positions()[0]
+    note = ""
+    for i in log_pos:
+        if i not in pos_frame.Ticker.to_list():
+    #             note += ("fix "+ i +"\n")
+            fix_unsettled_trade_update(i)
+            send_email("Fixed unsettled trade to size 0 " + str(i))
+        elif get_trade_log(i)["size"].iloc[0] != pos_frame.loc[pos_frame.Ticker == i,"Shares"].iloc[0]:
+            fix_unsettled_trade_update(i, size=pos_frame.loc[pos_frame.Ticker == i,"Shares"].iloc[0], partial=True)
+            send_email("Fixed unsettled trade to match size " + str(i))
+
+except Exception as e:
+    send_email("Fixed unsettled trade Fail\n" + str(e))
+    
+
+########################   
+# Future price
+########################
+    
+    
 try: 
     my_future = future()
 

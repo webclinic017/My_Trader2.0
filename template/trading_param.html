@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div>
+ <form id = "myform" action="{{ url_for('set_trading_param') }}" method="post">
+        <div class="form-group">
+            <label >Long_Term_Tickers</label>
+            <span>(Use comma as separator and upper case)</span>
+            <input type="text" class="form-control"  name="Long_Term_Tickers" value = "{{Long_Term_Tickers}}" size=300>
+            <label >cash_reserve</label>
+            <input type="text" class="form-control"  name="cash_reserve" value = "{{cash_reserve}}" size=300>
+            <label >VIX_cutloss</label>
+            <input type="text" class="form-control"  name="VIX_cutloss" value = {{VIX_cutloss}} >
+            <label >VIX_harvest</label>
+            <input type="text" class="form-control"  name="VIX_harvest" value = {{VIX_harvest}} >
+            
+            <label >fundamental_money</label>
+            <input type="text" class="form-control"  name="fundamental_money" value = {{fundamental_money}} >
+            <label >fundamental_harvest</label>
+            <input type="text" class="form-control"  name="fundamental_harvest" value= "{{fundamental_harvest}}">
+            <label >fundamental_harvest_prop</label>
+            <input type="text" class="form-control"  name="fundamental_harvest_prop" value= "{{fundamental_harvest_prop}}">
+            
+            <label >cci_buy</label>
+            <input type="text" class="form-control"  name="cci_buy" value = {{cci_buy}} >
+            <label >cci_sell</label>
+            <input type="text" class="form-control"  name="cci_sell" value= "{{cci_sell}}">
+           
+            <label >manual_cutloss</label>
+            <input type="text" class="form-control"  name="manual_cutloss" value= "{{manual_cutloss}}">
+            
+            <label >momentum_hold</label>
+            <input type="text" class="form-control"  name="momentum_hold" value= "{{momentum_hold}}">
+            
+            <label >manual_harvest</label>
+            <input type="text" class="form-control"  name="manual_harvest" value= "{{manual_harvest}}">
+            <label >manual_timeout_days</label>
+            <input type="text" class="form-control"  name="manual_timeout_days" value= "{{manual_timeout_days}}">
+            <label >momentum_cutloss</label>
+            <input type="text" class="form-control"  name="momentum_cutloss" value= "{{momentum_cutloss}}">
+            <label >momentum_harvest</label>
+            <input type="text" class="form-control"  name="momentum_harvest" value= "{{momentum_harvest}}">
+            <label >momentum_money</label>
+            <input type="text" class="form-control"  name="momentum_money" value= "{{momentum_money}}">
+            <label >momentum_timeout_days</label>
+            <input type="text" class="form-control"  name="momentum_timeout_days" value= "{{momentum_timeout_days}}">
+            <label >rsi_buy</label>
+            <input type="text" class="form-control"  name="rsi_buy" value= "{{rsi_buy}}">
+            <label >rsi_min_stock_price</label>
+            <input type="text" class="form-control"  name="rsi_min_stock_price" value= "{{rsi_min_stock_price}}">
+            <label >rsi_money</label>
+            <input type="text" class="form-control"  name="rsi_money" value= "{{rsi_money}}">
+            <label >rsi_sell</label>
+            <input type="text" class="form-control"  name="rsi_sell" value= "{{rsi_sell}}">
+            <label >strategy_cutloss</label>
+            <input type="text" class="form-control"  name="strategy_cutloss" value= "{{strategy_cutloss}}">
+            <label >strategy_harvest</label>
+            <input type="text" class="form-control"  name="strategy_harvest" value= "{{strategy_harvest}}">
+            <label >strategy_timeout_days</label>
+            <input type="text" class="form-control"  name="strategy_timeout_days" value= "{{strategy_timeout_days}}">
+            <br>
+            <button type="submit" class="btn btn-primary">Update Trade Parameter</button>
+          
+ 
+        </div>
+        
+      
+        
+    </form>
+
+</div>
+
+
+
+
+
+
+{% endblock %}

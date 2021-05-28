@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+
+
+<div class="form">       
+    <form id = "myform"  method="post">
+        <div class="form-group">
+            <label for="Ticker">Ticker</label>
+            <input type="text" class="form-control"  name="ticker"  >
+            
+            <div class="form-group">
+              <label >Period</label>
+              <select class="form-control" name="period" >
+                <option value = "today">today</option>
+                <option value = "daily">daily</option>
+                <option value = "annual">annual</option>
+                <option value = "quarter" >quarter</option>
+              </select>
+            </div>
+       
+ 
+        </div>
+        
+      
+        <button type="submit" class="btn btn-primary" formaction="{{ url_for('get_dcf') }}">Get DCF</button>
+        <button type="submit" class="btn btn-primary" formaction="{{ url_for('get_f_statement_growth') }}">Get Financial Statement Growth</button>
+         <button type="submit" class="btn btn-primary" formaction="{{ url_for('get_keymetrics') }}">Get Key Metrics</button>
+    </form>
+</div>
+
+{% if valuation == "Valuation Error Try Again" %}
+<div id = "result alert">
+{{alert | safe}}
+</div>
+
+{% endif %}
+
+
+
+{% if valuation|length > 180 %}
+
+<h3>Lastest: {{ v_type }}</h3>
+<div id = "result">
+    
+    {{valuation | safe}}
+    
+</div>
+
+
+
+{% endif %}
+
+
+
+{% endblock %}

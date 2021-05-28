@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div>
+ <form class="form" id = "Trade_From"  method="post">
+        <div class="form-group">
+            <label >Ticker</label>
+            <input type="text" class="form-control"  name="ticker" value = {{ticker}} >
+            <label >Expiration</label>
+            <input type="text" class="form-control"  name="exp_pos" value = {{exp_pos}} >
+          
+            <br>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="pc"  value="put" checked>
+              <span class="form-check-label" >
+                Put
+              </span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="pc"  value="call">
+              <span class="form-check-label" >
+                Call
+              </span>
+            </div>
+            
+            <br>
+<!--              <div class="form-check">
+              <input class="form-check-input" type="radio" name="option_bs"  value="buy" checked>
+              <span class="form-check-label" >
+                Buy
+              </span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="option_bs"  value="sell">
+              <span class="form-check-label" >
+                Sell
+              </span>  
+            </div> -->
+            
+            
+            <label >Strike Price</label>
+            <input type="text" class="form-control"  name="strike_price" value= "{{my_price}}">
+            
+            <label >Riskfree Rate</label>
+            <input type="text" class="form-control"  name="riskless_rate" value=  "{{riskless_rate}}" >
+            
+            <label >Volatility</label>
+            <input type="text" class="form-control"  name="volatility" value= "{{volatility}}" >
+            
+            <br>
+
+            <button type="submit" class="btn btn-primary" formaction="{{ url_for('option_pricing') }}">Get Option Pricing&Table</button>
+            
+            <br>
+            <br>
+
+            <button type="submit" class="btn btn-primary" formaction="{{ url_for('option_report') }}">Get Option Opportunity Report</button>
+                
+ 
+        </div>
+        
+      
+        
+    </form>
+
+</div>
+
+
+{% if option_report|length > 150 %}
+<div class = "result">
+<h3>Option Report</h3>
+    {{option_report | safe}}
+
+</div>
+{% else %}
+
+{% endif %}
+
+
+
+{% if curr_option|length > 150 %}
+<div class = "result">
+<h3>Current Option</h3>
+    {{curr_option | safe}}
+
+</div>
+{% else %}
+
+{% endif %}
+
+
+{% if curr_option|length > 150 %}
+<div class = "result">
+<h3>Current Option Pricing</h3>
+    {{option_pricing | safe}}
+
+</div>
+{% else %}
+
+{% endif %}
+
+
+
+{% endblock %}
