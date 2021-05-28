@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+
+
+
+<div class="form">       
+    <form id = "myform"  method="post">
+        <div class="form-group">
+            <label for="Ticker">Ticker</label>
+            <input type="text" class="form-control"  name="ticker"  >
+            
+            <label >Number of News</label>
+            <input type="text" class="form-control"  name="number"  >
+            
+         
+ 
+        </div>
+        
+
+         <button type="submit" class="btn btn-primary" formaction="{{ url_for('get_news') }}">Get News</button>
+    </form>
+</div>
+
+{% if alert %}
+<div id = "result alert">
+{{alert | safe}}
+</div>
+
+{% endif %}
+
+
+
+{% if news_text|length > 180 %}
+
+<h3>Lastest {{ticker}}</h3>
+<div id = "result">
+    
+    {{news_text | safe}}
+    
+</div>
+
+
+
+{% endif %}
+
+
+
+{% endblock %}

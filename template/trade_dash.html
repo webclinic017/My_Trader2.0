@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+<!-- <div id = "Head_Title">
+    <h1>Kenpyfin Web Dashboard</h1>
+</div>
+
+    {% if minute_beta|length %}
+    <div id= "status">
+    <h2>Current Status</h2>
+        {{minute_beta | safe}}
+    </div>    
+    {% else %}
+    {% endif %} -->
+
+
+<div class="form">       
+    <form id = "myform" action="{{ url_for('get_price') }}" method="post">
+        <div class="form-group">
+            <label for="Ticker">Ticker</label>
+            <input type="text" class="form-control"  name="ticker"  >
+ 
+        </div>
+        
+      
+        <button type="submit" class="btn btn-primary">Get Quote</button>
+    </form>
+</div>
+
+
+{% if ticker|length %}
+
+<h3>Quote for {{ticker}}</h3>
+<div id = "result">
+    
+    {{quote | safe}}
+    
+</div>
+
+
+
+<!-- Trade Form -->
+
+
+{% if quote == "Load Error" %}
+
+{% else %}
+<div class="form" id = "Trade_Form">
+    
+    <h5>Do you want to trade the stock?</h5>
+    
+  <form id = "myform" action="{{ url_for('stock_trade') }}" method="post">
+        <div class="form-group">
+            <label for="Ticker">Ticker</label>
+            <input type="text" class="form-control"  name="ticker" value = {{ticker}} >
+             <label >Limit Price</label>
+            <input type="text" class="form-control"  name="limit_price" value = {{quote_price}} >
+           <br>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="stock_bs"  value="buy" checked>
+              <span class="form-check-label">
+                Buy
+              </span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="stock_bs"  value="sell">
+              <span class="form-check-label" >
+                Sell
+              </span>
+            </div>
+           <label >Quantity</label>
+            <input type="text" class="form-control"  name="stock_quantity" >
+        </div>
+
+        <button type="submit" class="btn btn-primary">Trade!</button>
+    </form>    
+    
+</div>
+{% endif %}
+
+{% else %}
+
+{% endif %}
+
+
+<!-- End Trade Form -->
+
+
+
+{% if stock_trade_result == "Success" %}
+<div class = "result">
+<h2>Stock Trade Success!</h2>
+    {{stock_trade_result}}
+</div>
+{% elif stock_trade_result == "Fail" %}
+
+
+<div class = "result">
+<h2>Stock Trade Fail!</h2>
+</div>
+
+{% else %}
+
+{% endif %}
+
+
+
+<hr style="height:2px;border-width:0;color:gray;background-color:gray;margin: 15% 0 15% 0">
+
+
+
+
+<!-- Option Session -->
+
+
+<div class = "Title">
+    <h2>Option Session</h2>
+</div>
+
+
+
+<div>
+ <form class="form" name = "option_table_form" id = "Trade_From"  method="post">
+        <div class="form-group">
+            <label >Ticker</label>
+            <input type="text" class="form-control"  name="ticker" value = {{ticker}} >
+            <label >Expiration</label>
+            <input type="text" class="form-control"  name="exp_pos" value = {{exp_pos}} >
+            <label >List Length</label>
+            <input type="text" class="form-control"  name="list_len" value = 15 > 
+            <br>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="pc"  value="put" checked>
+              <span class="form-check-label" >
+                Put
+              </span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="pc"  value="call">
+              <span class="form-check-label" >
+                Call
+              </span>
+            </div>
+            
+            <br>
+             <div class="form-check">
+              <input class="form-check-input" type="radio" name="option_bs"  value="buy" checked>
+              <span class="form-check-label" >
+                Buy
+              </span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="option_bs"  value="sell">
+              <span class="form-check-label" >
+                Sell
+              </span>                
+            </div>
+            
+            
+            <label >Strike Price</label>
+            <input type="text" class="form-control"  name="strike_price" value= "{{my_price}}">
+            
+            <label >Quantity</label>
+            <input type="text" class="form-control"  name="option_quantity"  >
+            
+            <br>
+            <button type="submit" name =  "option_table" class="btn btn-primary" formaction="{{ url_for('get_option') }}" onclick = "return option_table();">Get Option Table</button>
+            <button type="submit" name =  "putcall" class="btn btn-primary" formaction="{{ url_for('get_putcall') }}">Get Put Call Difference</button>    
+             <button type="submit" class="btn btn-primary" formaction="{{ url_for('curr_option') }}">Current Option</button>
+            <br>
+            <br>
+            <button type="submit" class="btn btn-primary" formaction="{{ url_for('option_trade') }}">Trade Option!</button>
+ 
+        </div>
+        
+      
+        
+    </form>
+
+</div>
+
+
+<br>
+
+<br>
+
+{% if curr_option|length > 150 %}
+<div class = "result">
+<h3>Current Option</h3>
+    {{curr_option | safe}}
+
+</div>
+{% else %}
+
+{% endif %}
+
+
+<br>
+<br>
+
+{% if option|length > 150 %}
+<div class = "result">
+<h2>Option for {{ticker}}</h2>
+   
+    {{option | safe}}
+    
+</div>
+{% else %}
+
+{% endif %}
+
+<br>
+<br>
+
+
+{% if putcall %}
+<div class = "result">
+   
+    <br>
+    <br>
+    Put Call Open Interest Difference is: {{putcall}}
+    
+</div>
+{% else %}
+
+{% endif %}
+
+
+<br>
+<br>
+
+
+<!-- {% if option|length %}
+<form id = "Trade_From" action="{{ url_for('option_trade') }}" method="post">
+
+   <h3>Option Trade</h3>
+ 
+
+    
+    <div class="form-group">
+            <label >Ticker</label>
+            <input type="text" class="form-control"  name="ticker" value = {{ticker}} >
+            <label >Expiration</label>
+            <input type="text" class="form-control"  name="exp_pos" value = {{exp_pos}} >
+            
+            <br>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="pc"  value="put" checked>
+              <span class="form-check-label" >
+                Put
+              </span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="pc"  value="call">
+              <span class="form-check-label" >
+                Call
+              </span>
+            </div>
+            
+            <br>
+             <div class="form-check">
+              <input class="form-check-input" type="radio" name="option_bs"  value="buy" checked>
+              <span class="form-check-label" >
+                Buy
+              </span>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="option_bs"  value="sell">
+              <span class="form-check-label" >
+                Sell
+              </span>
+            </div>
+            
+            
+            <label >Strike Price</label>
+            <input type="text" class="form-control"  name="trade_strike_price" value= "{{strike_price}}">
+            
+    
+            <label >Quantity</label>
+            <input type="text" class="form-control"  name="option_quantity"  >
+        
+        <br>
+        <button type="submit" class="btn btn-primary">Trade Option!</button>
+</div>
+</form>
+{% else %}
+
+{% endif %} -->
+
+
+
+
+
+
+
+{% if option_trade_result|length %}
+<div class = "result">
+<h2>Option Trade Result</h2>
+
+
+ 
+    {{option_trade_result | safe}}
+    
+</div>
+
+{% else %}
+
+
+{% endif %}
+
+
+
+{% endblock %}
+
