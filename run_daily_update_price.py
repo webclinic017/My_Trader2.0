@@ -42,7 +42,7 @@ try:
     #             note += ("fix "+ i +"\n")
             fix_unsettled_trade_update(i)
             send_email("Fixed unsettled trade to size 0 " + str(i))
-        elif get_trade_log(i)["size"].iloc[0] != pos_frame.loc[pos_frame.Ticker == i,"Shares"].iloc[0]:
+        elif get_trade_log(i)["size"].sum() != pos_frame.loc[pos_frame.Ticker == i,"Shares"].iloc[0]:
             fix_unsettled_trade_update(i, size=pos_frame.loc[pos_frame.Ticker == i,"Shares"].iloc[0], partial=True)
             send_email("Fixed unsettled trade to match size " + str(i))
 
