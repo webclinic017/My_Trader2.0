@@ -22,6 +22,8 @@ put_now = put_ticker.iloc[0]
 call_now = call_ticker.iloc[0]
 put_traded = []
 call_traded = []
+
+
 ##################
 
 # Screen Put
@@ -68,8 +70,8 @@ if datetime.now().hour >=7 and datetime.now().hour <20:
 
     if len(put_result)>0:
 
-        for i in range(1,len(put_result.symbol)):
-            if trade_flag < 1:
+        for i in range(0,len(put_result.symbol)):
+            if trade_flag < 0:
                 try:
 
 
@@ -137,8 +139,8 @@ if datetime.now().hour >=7 and datetime.now().hour <20:
     
     if len(call_result)>0:
     
-        for i in range(1,len(call_result.symbol)):
-            if  trade_flag < 1:
+        for i in range(0,len(call_result.symbol)):
+            if  trade_flag < 2:
                 try:
 
 

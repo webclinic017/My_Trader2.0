@@ -1179,6 +1179,8 @@ def momentum_backtest(ticker,lookback,holddays,robinhood,method="realtimeday",an
     return cerebro.broker.getvalue(),np.log(cerebro.broker.getvalue()/2000)/np.std(trade_returns),last_trade[-1],last_price[-1],np.max(trade_returns),np.min(trade_returns)
 
 
+
+
 ##########################
 
 

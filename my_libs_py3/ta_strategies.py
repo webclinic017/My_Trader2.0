@@ -154,7 +154,7 @@ def backtest_pair(i,j, capital = 2000, method = "day",back_day = 80,window = 7 )
                 return -1.25
             elif data_frame>0.75:
                 return -1.75
-            elif data_frame:
+            elif data_frame<-0.5:
                 return -2.25
             elif data_frame<-0.75:
                 return -2.75
@@ -166,7 +166,7 @@ def backtest_pair(i,j, capital = 2000, method = "day",back_day = 80,window = 7 )
                 return 1.25
             elif data_frame>0.75:
                 return 1.75
-            elif data_frame:
+            elif data_frame<-0.6:
                 return 2.25
             elif data_frame<-0.75:
                 return 2.75
