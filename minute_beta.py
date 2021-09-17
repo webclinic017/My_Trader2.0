@@ -215,10 +215,6 @@ html += "<br><br> Short VIX Enter: %.3f, Short VIX Exit: %.3f;<br>Long VIX Enter
 tickers = get_open_opsition()
 strategy_name = "vix_dayroll"
 
-
-
-
-
 for i in tickers:
     print (i)
     i.encode("ASCII")
@@ -231,7 +227,6 @@ for i in tickers:
     tzz = pytz.timezone('US/Pacific')
     if datetime.now(tzz) - log.TimeStamp.iloc[-1].replace(tzinfo=tzz) >= timedelta(hours=15) \
         and log["size"].sum() != 0:
-
 
         if ((realtimequote(i)["price"].iloc[0]- cost)/cost) < trading_param["VIX_cutloss"]:
 

@@ -27,6 +27,8 @@ try:
 
     strategy_name = "Fundamental"
 
+    cash_reserve = trading_param["cash_reserve"]
+
     money = trading_param["fundamental_money"]
 
 #     mongod = mongo("all_symbol","screenerModel")
@@ -74,21 +76,21 @@ try:
     target_list = fun_table.Ticker[:8]
 
     ##  Check buy signal
-
-    for i in target_list:
-        price = get_price_data([i],method = 'day',back_day=7)
-        quote = realtimequote(i).price.iloc[0]
-        size = np.ceil(money/quote)
-        if quote < price.Close.mean():
-            if robinhood.place_buy_bulk_checkup(ticker_list=[i],quantity_list=[size],skip_check= True) == "Trade Success!":
-                log_trade(i,size, robinhood.get_last_price(i), strategy_name)
-                send_email("Fundamental Cumulation Buy: %s"%i)
+    # check we have enough buying power after reserver
+    if robinhood.get_buying_power() > cash_reserve:
+        for i in target_list:
+            price = get_price_data([i],method = 'day',back_day=7)
+            quote = realtimequote(i).price.iloc[0]
+            size = np.ceil(money/quote)
+            if quote < price.Close.mean():
+                if robinhood.place_buy_bulk_checkup(ticker_list=[i],quantity_list=[size],skip_check= True) == "Trade Success!":
+                    log_trade(i,size, robinhood.get_last_price(i), strategy_name)
+                    send_email("Fundamental Cumulation Buy: %s"%i)
 
                 
     print("pass buy signal")
 
     ##  Check sell signal
-
     tickers = get_open_opsition()
 
     for i in tickers:
