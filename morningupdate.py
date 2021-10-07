@@ -2,7 +2,7 @@
 # Get Finviz Data
 ########################        
 
-from my_libs import *
+from my_libs_py3 import *
 from selenium import webdriver as se
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -84,12 +84,14 @@ while success < 3:
             return float(data)/100.0
 
         for i in data.columns:
+            print(i)
             row = 0 
             while data.loc[row,i] != data.loc[row,i] or data.loc[row,i] == None:
-                row +1
+                row = row +1
             try:
                 if "%" in data.loc[row,i]:
                     data.loc[:,i] = data[i].apply(lambda x: parser(x))
+
             except:
                 continue
 

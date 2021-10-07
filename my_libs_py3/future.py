@@ -297,8 +297,9 @@ class vix_dayroll_trade():
         long_size =  int(self.initial/realtimequote(self.long_symbol).price.values[0])
         #determine size by portfolio beta
         short_size_hedge = self.robinhood.hedge()[1]
-        short_size = short_size_initial if short_size_initial <= short_size_hedge else short_size_hedge
-        
+        # short_size = short_size_initial if short_size_initial <= short_size_hedge else short_size_hedge
+        short_size = short_size_hedge
+
         if vix_quote > enter_signal:
             if self.robinhood.place_buy_bulk_checkup(ticker_list=[self.short_symbol],quantity_list=[short_size],price_list=[realtimequote(self.short_symbol).price.values[0]] )== "Trade Success!":
                 log_trade(self.short_symbol,short_size, realtimequote(self.short_symbol).price.values[0], "vix_dayroll")

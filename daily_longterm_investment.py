@@ -8,11 +8,6 @@ from my_libs_py3 import *
 robinhood =robingateway()
 
 
-
-
-
-
-
 ########################################################
 # START of daily investment
 #######################################################
