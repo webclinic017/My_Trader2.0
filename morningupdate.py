@@ -84,7 +84,6 @@ while success < 3:
             return float(data)/100.0
 
         for i in data.columns:
-            print(i)
             row = 0 
             while data.loc[row,i] != data.loc[row,i] or data.loc[row,i] == None:
                 row = row +1

@@ -1,8 +1,8 @@
 from my_libs_py3.tdameritrade import *
 from my_libs_py3.my_lib import *
 
-
-client  = TDClient(client_id="QV4XBB76GOYNVORVOBPMN3PKZFURM0VZ",refresh_token=readgateway(7),account_ids=['277216702'])
+account_id = 277216702
+client  = TDClient(client_id="QV4XBB76GOYNVORVOBPMN3PKZFURM0VZ",refresh_token=readgateway(7),account_ids=[str(account_id)])
 
 
 def get_order_by_id(_id):
@@ -17,14 +17,14 @@ def get_td_last_order():
     return order[-1]
 
 def cancel_order(orderid):
-    code = client.cancelOrder(277216702,orderid).status_code
+    code = client.cancelOrder(account_id,orderid).status_code
     if code == 200:
         return True
     else:
         time.sleep(3)
-        code = client.cancelOrder(277216702,orderid).status_code
+        code = client.cancelOrder(account_id,orderid).status_code
         time.sleep(1)
-        code = client.cancelOrder(277216702,orderid).status_code
+        code = client.cancelOrder(account_id,orderid).status_code
     if code == 200:
         return True
     else:
