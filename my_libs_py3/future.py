@@ -223,12 +223,13 @@ class future ():
 class vix_dayroll_trade():
     
     def __init__(self,robinhood,initial = 300,day_range = 54):
-        
-        self.initial = initial
+
         self.short_symbol = "SVXY"
         self.long_symbol = "VIXY"
         self.robinhood = robinhood
         self.day_range = day_range
+        buying_power = robinhood.get_buying_power()
+        self.initial = initial if initial <= buying_power else buying_power
     
     def vix_dayroll(self):
 
@@ -291,14 +292,20 @@ class vix_dayroll_trade():
         vix_quote = self.vix_dayroll()
         #vix_quote = -0.0050
 
-        ##Options
+        ## Short VIX
         #determine size by setting cash amount
-        short_size_initial = int(self.initial/realtimequote(self.short_symbol).price.values[0])
-        long_size =  int(self.initial/realtimequote(self.long_symbol).price.values[0])
-        #determine size by portfolio beta
-        short_size_hedge = self.robinhood.hedge()[1]
-        # short_size = short_size_initial if short_size_initial <= short_size_hedge else short_size_hedge
-        short_size = short_size_hedge
+        short_size = int(self.initial/realtimequote(self.short_symbol).price.values[0])
+
+
+        # determine size by portfolio beta
+
+
+        ## Buy VIX and hedge portfolio
+        long_size_initial =  int(self.initial/realtimequote(self.long_symbol).price.values[0])
+        long_size_hedge = self.robinhood.hedge()[1]
+        # long_size = long_size_hedge
+        long_size = long_size_initial if long_size_initial <= long_size_hedge else long_size_hedge
+
 
         if vix_quote > enter_signal:
             if self.robinhood.place_buy_bulk_checkup(ticker_list=[self.short_symbol],quantity_list=[short_size],price_list=[realtimequote(self.short_symbol).price.values[0]] )== "Trade Success!":
