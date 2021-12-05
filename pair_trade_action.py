@@ -14,19 +14,19 @@ def pair_trade_action(ticker1,ticker2,cash=TRADE_CASH,close_action=False):
 
     # day_diff = log["TimeStamp"].astimezone(mytz) - datetime.now(mytz)
 
+    new_size1 = today_trade["size1"]
+    new_size2 = today_trade["size2"]
 
     if len(log) == 0:
         current_size1 = 0
         current_size2 = 0
+        if new_size1 == 0 or new_size2 == 0:
+            print("One of the stock has 0 in size. We don't trade one stock.")
+            return None
     else:
         # log = log.iloc[0]
         current_size1 = log["size1"].sum()
         current_size2 = log["size2"].sum()
-
-
-    new_size1 = today_trade["size1"]
-    new_size2 = today_trade["size2"]
-
 
     trade_size1 = new_size1 - current_size1
     trade_size2 = new_size2 - current_size2

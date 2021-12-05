@@ -738,6 +738,7 @@ class get_robinhood:
         result.columns = ["Ticker","Quantity"]
         result = result.dropna()
         return result
+
     def hedge(self,method = "self_minute",hedge_int = "VIXY",target_beta =0.0):
         hedge_int_beta =beta([hedge_int],interval ="minute",robinhood=self)[0].iloc[0][0]
         hedge_int_price = self.get_ask_price(hedge_int)
