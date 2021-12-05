@@ -66,7 +66,20 @@ try:
 
     fun_table["avg_rank"] = pd.DataFrame.mean(fun_table[target],axis=1,skipna=True,numeric_only=True)
 
-    fun_table = fun_table.sort_values("avg_rank")
+    # fun_table = fun_table.sort_values("avg_rank")
+
+    for i in fun_table.index:
+        relative_rank = fun_table.loc[i, "avg_rank"] / fun_table.loc[
+            fun_table.Sector == fun_table.loc[i, "Sector"], "Sector"].count()
+        #     relative_rank = fun_table.loc[i,"avg_rank"]/fun_table.loc[fun_table.Sector == fun_table.loc[i,"Sector"],"Market Cap"].mean()
+        #     relative_rank = fun_table.loc[i,"avg_rank"]*(1- (1/fun_table.loc[fun_table.Sector == fun_table.loc[i,"Sector"],"Market Cap"].mean()))
+        #     relative_rank = fun_table.loc[i,"avg_rank"]/fun_table.loc[fun_table.Sector == fun_table.loc[i,"Sector"],"Market Cap"].mean()
+
+        fun_table.loc[i, "relative_rank"] = relative_rank
+    #     fun_table.loc[i,"relative_rank"] = fun_table.loc[i,"avg_rank"]
+
+    fun_table = fun_table.sort_values("relative_rank")
+
 
     target_list = fun_table.Ticker[:8]
 
@@ -74,7 +87,7 @@ try:
     # check we have enough buying power after reserver
     if robinhood.get_buying_power() > cash_reserve:
         for i in target_list:
-            price = get_price_data([i],method = 'day',back_day=7)
+            price = get_price_data([i],method = 'day',back_day=14)
             quote = realtimequote(i).price.iloc[0]
             size = np.ceil(money/quote)
             if quote < price.Close.mean():
