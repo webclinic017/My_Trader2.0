@@ -107,16 +107,6 @@ def fix_unsettled_trade_update(ticker, size=0, partial=False):
 
 
 
-
-def fix_unsettled_trade(ticker, size=0, partial=False):
-    if not partial:
-        log = get_trade_log(ticker)
-        log_trade(ticker,-log.iloc[-1]["size"],log.iloc[-1]["Price"],log.iloc[-1]["Strategy"])
-    elif size == 0:
-        print ("Please enter size for partial size fix") 
-    else:
-        log_trade(ticker,-(log.iloc[-1]["size"]-size),log.iloc[-1]["Price"],log.iloc[-1]["Strategy"])
-
 def log_trade(ticker,size, price, strategy , hold_days = None, database = "trade_log"):
     timestamp = datetime.now()
     mongod = mongo(database,ticker)
@@ -128,13 +118,7 @@ def log_trade(ticker,size, price, strategy , hold_days = None, database = "trade
     mongod.conn.frame_to_mongo(upload_data)
 
 
-def log_pair_trade(ticker1,ticker2,size1,size2, price1,price2 , database = "pair_trade_log"):
-    timestamp = datetime.now()
-    mongod = mongo(database,ticker)
 
-    upload_data = pd.DataFrame([{"TimeStamp":timestamp, "Ticker1":ticker1,"Ticker2":ticker2,"size1":size1,"size2":size2,"Price1":price1,"Price2":price2}])
-
-    mongod.conn.frame_to_mongo(upload_data)
 
 # def log_trade(ticker,size, price, strategy , database = "trade_log"):
 #     timestamp = datetime.now()
@@ -187,22 +171,39 @@ def get_trade_log(ticker,database = "trade_log"):
         print (e)
         result = pd.DataFrame()
     return result 
-        
-# def get_open_opsition(database = "trade_log"): 
-#     mongod = mongo(database)
-#     working = mongod.db.collection_names()
-#     sent = []
-#     for i in working:
-#         if get_trade_log(i)["size"].sum() != 0:
-#             sent.append(i)
-            
-            
-     
-#     return sent    
 
-# def get_trade_log(ticker,database = "trade_log"): 
-#     mongod = mongo(database)
-#     return pd.DataFrame(mongod.db[ticker].find().sort("TimeStamp",pymongo.ASCENDING))    
+def get_pair_open_opsition(database = "pair_trade_log"): 
+    mongod = mongo(database)
+    working = mongod.conn.db.list_collection_names()
+    sent = []
+    
+    for i in working:
+        temp = get_pair_trade_log(i)
+        if len(temp) > 0 and temp["size1"].sum() != 0:
+            sent.append(i)
+   
+    return sent   
+
+def get_pair_trade_log(ticker_combo,database = "pair_trade_log"): 
+    
+    mongod = mongo(database,ticker_combo)
+    try:
+        result = pd.DataFrame(mongod.conn.table.find().sort("TimeStamp",-1)) 
+    except Exception as e:
+        print (e)
+        result = pd.DataFrame()
+    return result 
+
+
+def log_pair_trade(ticker1,ticker2,size1,size2, price1,price2 , database = "pair_trade_log"):
+    timestamp = datetime.now()
+    ticker = ticker1+"_"+ticker2
+    mongod = mongo(database,ticker)
+
+    upload_data = pd.DataFrame([{"TimeStamp":timestamp, "Ticker1":ticker1,"Ticker2":ticker2,"size1":size1,"size2":size2,"Price1":price1,"Price2":price2}])
+
+    mongod.conn.frame_to_mongo(upload_data)
+
 
 
 
@@ -737,6 +738,7 @@ class get_robinhood:
         result.columns = ["Ticker","Quantity"]
         result = result.dropna()
         return result
+
     def hedge(self,method = "self_minute",hedge_int = "VIXY",target_beta =0.0):
         hedge_int_beta =beta([hedge_int],interval ="minute",robinhood=self)[0].iloc[0][0]
         hedge_int_price = self.get_ask_price(hedge_int)
@@ -994,6 +996,199 @@ def update_price(method = "day",test = False, interval = 1, freq = 'minutes',rob
     
     return result5
 
+
+
+
+def self_pair_trade(i,j,cash = 2000,back_day = 360,window = 20,method = "self_minute",trade_mode = False):
+    
+
+    
+    # market_price=True
+    # exec_next_bar = False
+    # i = "DEN"
+    # j = "CMO"
+    
+
+    robinhood = robingateway()
+
+    price1 = get_price_data([i], method=method,robinhood=robinhood,back_day=back_day )
+    price1 = price1.set_index("TimeStamp")
+    # price1.loc[price1.Open == 0,"Open"] = np.NaN
+
+
+    price2 = get_price_data([j], method=method,robinhood=robinhood,back_day=back_day )
+    price2 = price2.set_index("TimeStamp")
+
+
+    # set to the same length
+    if len(price2) != len(price1):
+        price1 = get_price_data([i], method="realtimeday",robinhood=robinhood,back_day=back_day )
+        price1 = price1.set_index("TimeStamp")
+        # price1.loc[price1.Open == 0,"Open"] = np.NaN
+
+
+        price2 = get_price_data([j], method="realtimeday",robinhood=robinhood,back_day=back_day )
+        price2 = price2.set_index("TimeStamp")
+
+
+    price_table = pd.DataFrame()
+    #--------------------------------------------------------------
+    #     return price1, price2
+
+
+    price1.loc[:,"log_ret"] = log(price1.Close / price1.Close.shift(1))
+    price2.loc[:,"log_ret"] = log(price1.Close / price2.Close.shift(1))
+
+
+    price1.loc[:, "log_ret_mv"] = price1.log_ret.rolling(window).mean()
+    price2.loc[:, "log_ret_mv"] = price2.log_ret.rolling(window).mean()
+
+    price1 = price1.fillna(method="bfill")
+    price2 = price2.fillna(method="bfill")
+
+    price_table.loc[:,"relative"] = price1.log_ret_mv / price2.log_ret_mv
+
+    price_table.loc[:,"relative_mv"] = price_table["relative"].rolling(window, min_periods=window).mean()
+    price_table["relative_mv"] = abs(price_table["relative_mv"])
+
+    price_table = price_table.join(price1["adjClose"]).rename({"adjClose":"stock1"},axis=1)
+    price_table = price_table.join(price2["adjClose"]).rename({"adjClose":"stock2"},axis=1)
+
+    price_table = price_table.dropna(subset=["stock1","stock2"])
+
+    for i in range(1,len(price_table)):
+        j = i- window
+        if j < 0 :
+            j = 0 
+        price_table.loc[price_table.iloc[i].name,"slope"] = stats.linregress(price1.log_ret.iloc[j:i],price2.log_ret.iloc[j:i])[0] 
+        price_table.loc[price_table.iloc[i].name,"hedge_ratio"]= \
+        sm.OLS(price_table.stock2.iloc[j:i],price_table.stock1.iloc[j:i]).fit().params[0]
+
+    price1.loc[:,"volatility"] = price1.log_ret.rolling(window).std()
+    price2.loc[:,"volatility"] = price2.log_ret.rolling(window).std()
+
+    price_table["z_score"] =( price_table["relative"]-price_table["relative_mv"])/price_table.relative.std()
+    # up, mid , low = ta.BBANDS(price1.Close*price_table.hedge_ratio)
+    up, mid , low = ta.BBANDS(price_table["z_score"])
+
+    bb = pd.DataFrame({"up":up,"mid":mid,"low":low})
+
+    price_table = price_table.join(bb)
+    price_table = price_table.fillna(method="bfill")
+
+    def buy_line(slope):
+        if slope>0.5:
+            return -1.25
+        elif slope>0.75:
+            return -1
+        elif slope<-0.5:
+            return -2.25
+        elif slope<-0.75:
+            return -2.75
+        else:
+            return -2
+    def sell_line(slope):
+        if slope>0.5:
+            return 1.25
+        elif slope>0.75:
+            return 1
+        elif slope<-0.5:
+            return 2.25
+        elif slope<-0.75:
+            return 2.75
+        else:
+            return 2
+
+    price_table["buy_line"] = price_table.slope.apply(buy_line)
+    price_table["sell_line"] = price_table.slope.apply(sell_line)
+
+    # price_table["buy_line"] = price_table["low"]
+    # price_table["sell_line"] = price_table["up"]
+
+
+    price_table["cash"] = cash
+    price_table["buying_power"] = cash
+    price_table["margin1"] = 0
+    price_table["margin2"] = 0
+    price_table["size1"] = 0
+    price_table["size2"] = 0
+    price_table["holddays"] = 0
+    
+    ################
+    #Trade Action
+    ################
+    
+    for i in range(len(price_table)):
+        if i != len(price_table)-1:
+            i_1 = price_table.index[i+1]
+        else:
+            i_1 = price_table.index[i]
+        i = price_table.index[i]
+        ## add 1 holddays
+        if price_table.loc[i,"size1"] != 0 or  price_table.loc[i,"size2"] != 0 :
+            price_table.loc[i,"holddays"] +=1
+
+        ## Check holddays
+        if price_table.loc[i,"holddays"] >= 7:
+
+            price_table.loc[i,"cash"] = price_table.loc[i,"cash"]+(price_table.loc[i,"size1"])*price_table.loc[i,"stock1"]
+            price_table.loc[i,"cash"] = price_table.loc[i,"cash"]+(price_table.loc[i,"size2"])*price_table.loc[i,"stock2"]
+            price_table.loc[i,"buying_power"]=price_table.loc[i,"cash"]
+            price_table.loc[i,"size1"] = 0
+            price_table.loc[i,"size2"] = 0
+            price_table.loc[i,"margin1"] = 0
+            price_table.loc[i,"margin2"] = 0
+            price_table.loc[i,"holddays"] = 0
+
+        ## Check buy
+        if price_table.loc[i,"z_score"] < price_table.loc[i,"buy_line"] and price_table.loc[i,"size1"]<=0 :
+#             print("%s -- buy"%i)
+            ## determine the number of shares for both stocks
+            share_1 = int(price_table.loc[i,"buying_power"]/(price_table.loc[i,"stock1"] + price_table.loc[i,"stock1"]* price_table.loc[i,"hedge_ratio"])) - price_table.loc[i,"size1"]
+            share_2 = int(-share_1 * price_table.loc[i,"hedge_ratio"]) - price_table.loc[i,"size2"]
+
+            if price_table.loc[i,"buying_power"] >= abs(share_1)*price_table.loc[i,"stock1"] + abs(share_2)*price_table.loc[i,"stock2"]:
+
+                price_table.loc[i,"size1"] = share_1
+                price_table.loc[i,"size2"] = share_2
+                price_table.loc[i,"margin2"] = abs(price_table.loc[i,"stock1"]*share_2)
+
+                price_table.loc[i,"cash"] = price_table.loc[i,"cash"] - (price_table.loc[i,"stock1"]*share_1 + price_table.loc[i,"stock2"]*share_2)
+
+                price_table.loc[i,"buying_power"] = price_table.loc[i,"cash"] - price_table.loc[i,"margin2"]
+
+
+        ## Check sell
+        if price_table.loc[i,"z_score"] > price_table.loc[i,"sell_line"] and price_table.loc[i,"size1"]>=0 :
+#             print("%s -- sell"%i)
+            ## determine the number of shares for both stocks
+            share_1 = -int(price_table.loc[i,"buying_power"]/(price_table.loc[i,"stock1"] + price_table.loc[i,"stock1"]* price_table.loc[i,"hedge_ratio"])) - price_table.loc[i,"size1"]
+            share_2 = int(-share_1 * price_table.loc[i,"hedge_ratio"]) - price_table.loc[i,"size2"]
+
+            if price_table.loc[i,"buying_power"] >= abs(share_1)*price_table.loc[i,"stock1"] + abs(share_2)*price_table.loc[i,"stock2"]:
+
+                price_table.loc[i,"size1"] = share_1
+                price_table.loc[i,"size2"] = share_2
+
+                price_table.loc[i,"margin1"] = abs(price_table.loc[i,"stock1"]*share_1)
+
+                price_table.loc[i,"cash"] = price_table.loc[i,"cash"] - (price_table.loc[i,"stock1"]*share_1 + price_table.loc[i,"stock2"]*share_2)
+
+                price_table.loc[i,"buying_power"] = price_table.loc[i,"cash"] - price_table.loc[i,"margin1"]
+
+        price_table.loc[i,"total_value"] = price_table.loc[i,"stock1"]*price_table.loc[i,"size1"] + price_table.loc[i,"stock2"]*price_table.loc[i,"size2"] + price_table.loc[i,"cash"]
+        
+        ## sync to next bar
+        price_table.loc[i_1,"size1"] = price_table.loc[i,"size1"]
+        price_table.loc[i_1,"size2"] = price_table.loc[i,"size2"]
+        price_table.loc[i_1,"cash"] =  price_table.loc[i,"cash"]
+        price_table.loc[i_1,"buying_power"] = price_table.loc[i,"buying_power"]
+        price_table.loc[i_1,"margin1"] = price_table.loc[i,"margin1"]
+        price_table.loc[i_1,"margin2"] = price_table.loc[i,"margin2"]
+        price_table.loc[i_1,"holddays"] = price_table.loc[i,"holddays"]
+        price_table.loc[i_1,"total_value"] = price_table.loc[i,"total_value"]
+        
+    return price_table
 
 #     '''
 

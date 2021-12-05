@@ -5,10 +5,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from .my_lib import *
 
-def send_email(body_html, sent_from="lgyhz1234@gmail.com", sent_to="lgyhz1234@gmail.com", title="Daily Position", body_content=""):
+def send_email(body_html, sent_from="kenli@kenpyfin.com", sent_to="lgyhz1234@gmail.com", title="Daily Position", body_content=""):
     
         
-    must_have = readgateway(2)
+    must_have = readgateway(8)
     
     sent_to = sent_to.strip('[]').split(',')
 
@@ -50,7 +50,8 @@ def send_email(body_html, sent_from="lgyhz1234@gmail.com", sent_to="lgyhz1234@gm
     print(('Subject: %s' % headers['subject']))
 
     context = ssl.create_default_context()    
-    s= smtplib.SMTP("smtp.gmail.com:587")
+    # s= smtplib.SMTP("smtp.gmail.com:587")
+    s = smtplib.SMTP("mail.kenpyfin.com:587")
        
         #s.connect("stmp.gmail.com")
     

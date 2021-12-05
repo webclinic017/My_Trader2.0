@@ -1,8 +1,34 @@
 from my_libs_py3.tdameritrade import *
 from my_libs_py3.my_lib import *
 
+account_id = 277216702
+client  = TDClient(client_id="QV4XBB76GOYNVORVOBPMN3PKZFURM0VZ",refresh_token=readgateway(7),account_ids=[str(account_id)])
 
-client  = TDClient(client_id="QV4XBB76GOYNVORVOBPMN3PKZFURM0VZ",refresh_token=readgateway(7),account_ids=['277216702'])
+
+def get_order_by_id(_id):
+    orders = client.orders()
+    orders = list(filter(lambda x: x["orderId"]==_id,orders))
+    return orders[0]
+
+
+def get_td_last_order():
+    order = client.orders()
+    order = list(sorted(filter(lambda x: x["orderLegCollection"][0]["orderLegType"]=="EQUITY",order),key=lambda x: x["enteredTime"]))
+    return order[-1]
+
+def cancel_order(orderid):
+    code = client.cancelOrder(account_id,orderid).status_code
+    if code == 200:
+        return True
+    else:
+        time.sleep(3)
+        code = client.cancelOrder(account_id,orderid).status_code
+        time.sleep(1)
+        code = client.cancelOrder(account_id,orderid).status_code
+    if code == 200:
+        return True
+    else:
+        return False
 
 
 def search_strike(x, thelist):
@@ -203,14 +229,16 @@ class order_equity():
         self.leg = []
 
 
-    def gen_leg(self,ticker:str,quantity:int, quantity_type = 'SHARES', instruction:instruction_type = None ):
+    def place (self,ticker:str,quantity:int ,price=None, quantity_type = 'SHARES', instruction:instruction_type = None):
+        
+        price = price or round(float(client.quoteDF(ticker).lastPrice),2)
 
         if instruction is None:
             if quantity < 0:
-                self.instruction = instruction_type.SELL
+                instruction = instruction_type.SELL
                 quantity=-quantity
             elif quantity > 0:
-                self.instruction = instruction_type.BUY
+                instruction = instruction_type.BUY
             else:
                 print ("Quantity should not be zero")
                 raise
@@ -219,40 +247,87 @@ class order_equity():
                 print ("When you feed instruction, Quantity should not be zero or less")
                 raise
 
-
-#         self.price = price or float(client.quoteDF(self.ticker).lastPrice)
-
-
-
-        self.leg.append(
-                {
+        order_dic = {
+            "session": "NORMAL",
+            "duration": 'DAY',
+            "orderType":self.ordertype,
+            "price": price,
+            "orderStrategyType": "SINGLE",
+            "orderLegCollection":  
+                [{
                     "orderLegType": "EQUITY",
                     "instrument": { 'symbol': ticker,'assetType': 'EQUITY'},
                     "instruction": instruction,
                     # "positionEffect": 'OPENING',
                     "quantity": quantity,
                     "quantityType":  quantity_type
-                }
-            )
+                }]
 
-        print("Current legs:")
-        print(self.leg)
-
-
-    def place (self,price=None):
+        }
+        client.placeOrder(client.accountIds[0],order_dic)
+        time.sleep(0.8)
+        ## Check order status
+        last_status = get_td_last_order()["status"]
+        last_id = get_td_last_order()["orderId"]
+        return last_id
+#         if last_status == "REJECTED":
+#             return "REJECTED"
+#         else:
+#             return "Not REJECTED"
         
-        price = price or float(client.quoteDF(self.ticker).lastPrice)
+    def pair_trade_place(self,ticker1:str,ticker2:str, quantity1:int ,quantity2:int ,price1=None, price2=None, quantity_type = 'SHARES'):
+        price1 = price1 or float(client.quoteDF(ticker1).lastPrice)
+        price2 = price2 or float(client.quoteDF(ticker2).lastPrice)
+
+        def get_instruction(quantity):
+            if quantity < 0:
+                instruction = instruction_type.SELL
+                quantity=-quantity
+            elif quantity > 0:
+                instruction = instruction_type.BUY
+            else:
+                print ("Quantity should not be zero")
+                raise
+            return instruction, abs(quantity)
+        
+        instruction1, quantity1 = get_instruction(quantity1)
+        instruction2, quantity2 = get_instruction(quantity2)
+   
 
         order_dic = {
             "session": "NORMAL",
             "duration": 'DAY',
             "orderType":self.ordertype,
-            "quantity": 0,
-            "price": self.price,
-            "orderStrategyType": "SINGLE",
-            "orderLegCollection": self.leg
+            "price": price1,
+            "orderStrategyType": "TRIGGER",
+            "orderLegCollection":  
+                [{
+                    "orderLegType": "EQUITY",
+                    "instrument": { 'symbol': ticker1,'assetType': 'EQUITY'},
+                    "instruction": instruction1,
+                    # "positionEffect": 'OPENING',
+                    "quantity": quantity1,
+                    "quantityType":  quantity_type
+                }],
+            "childOrderStrategies": [
+                                        {
+                                          "orderType": "MARKET",
+                                          "session": "NORMAL",
+                                          "price": price2,
+                                          "duration": "DAY",
+                                          "orderStrategyType": "SINGLE",
+                                          "orderLegCollection": [
+                                            {
+                                              "instruction": instruction2,
+                                              "quantity": quantity2,
+                                              "instrument": {"symbol": ticker2,"assetType": "EQUITY"},
+                                              "quantityType":  quantity_type 
+                                           }
+                                              ]
 
-        }
+                                            }
+                                    ]
+                 }
         client.placeOrder(client.accountIds[0],order_dic)
 
 
@@ -272,10 +347,10 @@ class order_option():
 
         if instruction is None:
             if quantity < 0:
-                instruction = instruction_type.SELL
+                instruction = instruction_type.SELL_TO_OPEN
                 quantity = -quantity
             elif quantity > 0:
-                instruction = instruction_type.BUY
+                instruction = instruction_type.BUY_TO_OPEN
                 
             else:
                 print ("Quantity should not be zero")
