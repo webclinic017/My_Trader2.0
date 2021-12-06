@@ -218,7 +218,11 @@ class future ():
                 print (e)
                 trial +=1
 
-        
+"""
+VIX Trade
+@author: Ken Li
+Licence: BSD
+"""
         
 class vix_dayroll_trade():
     
@@ -297,11 +301,10 @@ class vix_dayroll_trade():
         short_size = int(self.initial/realtimequote(self.short_symbol).price.values[0])
 
 
-        # determine size by portfolio beta
-
 
         ## Buy VIX and hedge portfolio
         long_size_initial =  int(self.initial/realtimequote(self.long_symbol).price.values[0])
+
         long_size_hedge = self.robinhood.hedge()[1]
         # long_size = long_size_hedge
         long_size = long_size_initial if long_size_initial <= long_size_hedge else long_size_hedge

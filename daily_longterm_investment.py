@@ -87,7 +87,9 @@ try:
     # check we have enough buying power after reserver
     if robinhood.get_buying_power() > cash_reserve:
         for i in target_list:
+
             price = get_price_data([i],method = 'day',back_day=14)
+
             quote = realtimequote(i).price.iloc[0]
             size = np.ceil(money/quote)
             if quote < price.Close.mean():
