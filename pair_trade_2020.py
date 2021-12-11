@@ -126,7 +126,7 @@ if __name__ == "__main__":
     print ("each length:%s"%steps)
     # pro = multiprocessing.get_context("spawn")
     with multiprocessing.Pool(n_thread) as pool:
-        pool.starmap(pair_screen(),
+        pool.starmap(pair_screen,
                  [(start,start+steps) for start in range(START,END,steps)])
 
 
