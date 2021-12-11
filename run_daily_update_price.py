@@ -81,7 +81,7 @@ try:
     
 #     update_fundamentals(robingateway(), skip_can=False)
     
-    send_email(body_html="",body_content="", title = "daily price update done") 
+    send_email(body_html="",body_content="", title = "future price update done")
     
     
     
