@@ -10,6 +10,7 @@ LOG_DB = "pair_trade_sharp_2021_500"
 
 def pair_screen(start,end):
     for i in ALL_TICKER[start:end]:
+        i = np.random.choice(ALL_TICKER[start:end])
         for j in ALL_TICKER:
             j = np.random.choice(ALL_TICKER)
             if i == j:
