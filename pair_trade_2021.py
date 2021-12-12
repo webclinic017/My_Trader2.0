@@ -80,7 +80,7 @@ if __name__ == "__main__":
     START = 0
     END = len(ALL_TICKER)
     n_thread = 5
-    steps = int((START - END) / n_thread)
+    steps = int((END - START) / n_thread)
     print("each length:%s" % steps)
     # pro = multiprocessing.get_context("spawn")
     with multiprocessing.Pool(n_thread) as pool:
