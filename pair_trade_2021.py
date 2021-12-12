@@ -5,6 +5,9 @@ import multiprocessing
 # Screen for candidate of momentum trade
 ########################
 
+LOG_DB = "pair_trade_sharp_2021_500"
+
+
 def pair_screen(start,end):
     for i in ALL_TICKER[start:end]:
         for j in ALL_TICKER:
@@ -31,7 +34,7 @@ def pair_screen(start,end):
                                     , columns=["Ticker_1", "Ticker_2", "End_Value", "Avg_Return", "Sharp_Ratio",
                                                "Min_Return", "Max_Return"])
                 temp["Refresh_Date"] = today
-                mongod = mongo("all_symbol", "pair_trade_sharp_2021_500")
+                mongod = mongo("all_symbol", LOG_DB)
                 mongod.conn.frame_to_mongo(temp)
 
                 print("Done %s and %s" % (i, j))
@@ -71,7 +74,7 @@ if __name__ == "__main__":
     trade_scale = "day"
     backdays = 80
 
-    mongod = mongo("all_symbol","pair_trade_screen_save")
+    mongod = mongo("all_symbol",LOG_DB)
     get = pd.DataFrame(mongod.conn.table.find({},{"Ticker_1":1,"Ticker_2":1}))
     if len(get)>0:
         TICKER_1 = get.Ticker_1.to_list()
