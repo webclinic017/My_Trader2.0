@@ -6,7 +6,7 @@ import multiprocessing
 ########################
 
 def pair_screen(start,end):
-    for i in ALL_TICKER[start,end]:
+    for i in ALL_TICKER[start:end]:
         for j in ALL_TICKER:
             if i == j:
                 continue
