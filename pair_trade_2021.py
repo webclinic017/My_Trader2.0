@@ -1,7 +1,7 @@
 from my_libs_py3 import *
 import multiprocessing
 import warnings
-warnings.simplefilter("ignore")
+warnings.simplefilter()
 
 ########################
 # Screen for candidate of momentum trade
