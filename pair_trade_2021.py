@@ -11,39 +11,39 @@ LOG_DB = "pair_trade_sharp_2021_500"
 def pair_screen(start,end):
     for i in ALL_TICKER[start:end]:
         i = np.random.choice(ALL_TICKER[start:end])
-        for j in ALL_TICKER:
-            j = np.random.choice(ALL_TICKER)
-            if i == j:
-                continue
+        # for j in ALL_TICKER:
+        j = np.random.choice(ALL_TICKER)
+        if i == j:
+            continue
 
-            checkLogMongo = mongo("all_symbol", LOG_DB)
-            get = pd.DataFrame(checkLogMongo.conn.table.find({"Ticker_1":i,"Ticker_2":j}))
-            if len(get) > 0:
-                continue
+        checkLogMongo = mongo("all_symbol", LOG_DB)
+        get = pd.DataFrame(checkLogMongo.conn.table.find({"Ticker_1":i,"Ticker_2":j}))
+        if len(get) > 0:
+            continue
 
-            try:
-                trade = self_pair_trade(i, j, cash=500)
+        try:
+            trade = self_pair_trade(i, j, cash=500)
 
-                end_value = trade.iloc[-1]["total_value"]
-                max_return = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).max(), 4)
-                min_return = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).min(), 4)
-                avg_return = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).mean(), 4)
-                vol = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).std(), 4)
-                sharpratio = avg_return / vol
+            end_value = trade.iloc[-1]["total_value"]
+            max_return = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).max(), 4)
+            min_return = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).min(), 4)
+            avg_return = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).mean(), 4)
+            vol = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).std(), 4)
+            sharpratio = avg_return / vol
 
 
-                temp = pd.DataFrame([(i, j, end_value, avg_return, sharpratio, min_return, max_return)] \
-                                    , columns=["Ticker_1", "Ticker_2", "End_Value", "Avg_Return", "Sharp_Ratio",
-                                               "Min_Return", "Max_Return"])
-                temp["Refresh_Date"] = today
-                mongod = mongo("all_symbol", LOG_DB)
-                mongod.conn.frame_to_mongo(temp)
+            temp = pd.DataFrame([(i, j, end_value, avg_return, sharpratio, min_return, max_return)] \
+                                , columns=["Ticker_1", "Ticker_2", "End_Value", "Avg_Return", "Sharp_Ratio",
+                                           "Min_Return", "Max_Return"])
+            temp["Refresh_Date"] = today
+            mongod = mongo("all_symbol", LOG_DB)
+            mongod.conn.frame_to_mongo(temp)
 
-                print("Done %s and %s" % (i, j))
-            except Exception as e:
-                print("--------------")
-                print(e)
-                print("--------------")
+            print("Done %s and %s" % (i, j))
+        except Exception as e:
+            print("--------------")
+            print(e)
+            print("--------------")
 
 
 if __name__ == "__main__":
