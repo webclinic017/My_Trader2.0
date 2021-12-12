@@ -11,10 +11,13 @@ LOG_DB = "pair_trade_sharp_2021_500"
 def pair_screen(start,end):
     for i in ALL_TICKER[start:end]:
         for j in ALL_TICKER:
+            j = np.random.choice(ALL_TICKER)
             if i == j:
                 continue
 
-            if i in TICKER_1 and j in TICKER_2:
+            checkLogMongo = mongo("all_symbol", LOG_DB)
+            get = pd.DataFrame(checkLogMongo.conn.table.find({"Ticker_1":i,"Ticker_2":j}))
+            if len(get) > 0:
                 continue
 
             try:
@@ -27,8 +30,6 @@ def pair_screen(start,end):
                 vol = round(np.log(trade["total_value"].shift(-1) / trade["total_value"]).std(), 4)
                 sharpratio = avg_return / vol
 
-                #             temp = pd.DataFrame([(i,j,end_value)]\
-                #     ,columns= ["Ticker_1","Ticker_2","End_Value"])
 
                 temp = pd.DataFrame([(i, j, end_value, avg_return, sharpratio, min_return, max_return)] \
                                     , columns=["Ticker_1", "Ticker_2", "End_Value", "Avg_Return", "Sharp_Ratio",
@@ -74,14 +75,6 @@ if __name__ == "__main__":
     trade_scale = "day"
     backdays = 80
 
-    mongod = mongo("all_symbol",LOG_DB)
-    get = pd.DataFrame(mongod.conn.table.find({},{"Ticker_1":1,"Ticker_2":1}))
-    if len(get)>0:
-        TICKER_1 = get.Ticker_1.to_list()
-        TICKER_2 = get.Ticker_2.to_list()
-    else:
-        TICKER_1 = []
-        TICKER_2 = []
 
     ## CP Id
     START = 0
