@@ -73,8 +73,12 @@ if __name__ == "__main__":
 
     mongod = mongo("all_symbol","pair_trade_screen_save")
     get = pd.DataFrame(mongod.conn.table.find({},{"Ticker_1":1,"Ticker_2":1}))
-    TICKER_1 = get.Ticker_1.to_list()
-    TICKER_2 = get.Ticker_2.to_list()
+    if len(get)>0:
+        TICKER_1 = get.Ticker_1.to_list()
+        TICKER_2 = get.Ticker_2.to_list()
+    else:
+        TICKER_1 = []
+        TICKER_2 = []
 
     ## CP Id
     START = 0
