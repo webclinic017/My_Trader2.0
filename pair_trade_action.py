@@ -122,10 +122,19 @@ def pair_trade_smaple():
 
     return candid  
 
+def pair_trade_top():
+    mongod = mongo("all_symbol","pair_trade_sharp_2021_500")
+    candid = pd.DataFrame(mongod.conn.table.find({"Sharp_Ratio":{"$exists":True}}))
+    top_return = candid.describe().loc["75%","Avg_Return"]
+    top_sharp = candid.describe().loc["75%","Sharp_Ratio"]
 
+    candid = pd.DataFrame(mongod.conn.table.find({"End_Value":{"$gt":TRADE_CASH},
+                                                  "Sharp_Ratio":{"$gt":top_sharp},
+                                                  "Avg_Return":{"$gt":top_return}}).sort("Sharp_Ratio",-1).limit(10))
+    return candid
 
 # buy check
-candid = pair_trade_smaple()
+candid = pair_trade_top()
 
 for ticker1, ticker2 in zip(candid.Ticker_1,candid.Ticker_2):
     pair_trade_action(ticker1,ticker2,cash=TRADE_CASH)
@@ -134,6 +143,7 @@ for ticker1, ticker2 in zip(candid.Ticker_1,candid.Ticker_2):
 #TODO
 # sell check
 
+## position adjustment
 pos = get_pair_open_opsition()
 for p in pos:
     p_log = get_pair_trade_log(p)
