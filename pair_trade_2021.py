@@ -1,5 +1,6 @@
-from my_libs_py3 import *
-import multiprocessing
+from .my_libs_py3 import *
+# import multiprocessing
+import billiard as multiprocessing
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -10,7 +11,7 @@ warnings.filterwarnings("ignore")
 LOG_DB = "pair_trade_sharp_2021_500"
 
 
-def pair_screen(start,end):
+def pair_screen(ALL_TICKER, start,end):
     for i in ALL_TICKER[start:end]:
         i = np.random.choice(ALL_TICKER[start:end])
         # for j in ALL_TICKER:
@@ -47,53 +48,52 @@ def pair_screen(start,end):
             print(e)
             print("--------------")
 
+def main():
+
+        mongod = mongo("all_symbol","screener")
+        ## This line gets the max refresh_date
+        tos = pd.DataFrame(mongod.conn.table.find({},{"Refresh_Date":1}).sort("Refresh_Date",-1).limit(1))["Refresh_Date"].iloc[0]
+        ALL_TICKER = pd.DataFrame(mongod.conn.table.find({"Refresh_Date":tos}))
+
+
+        # ## Initialization
+        # mongod.conn.conn.cursor().execute("truncate table all_symbol.pair_trade_sharp")
+        # mongod.conn.conn.cursor().execute("truncate table all_symbol.pair_trade_screen_save")
+        # mongod.conn.conn.commit()
+
+
+        # ALL_TICKER = pd.DataFrame(mongod.db["cantrade"].find()).Ticker.tolist()
+        result = pd.DataFrame()
+
+
+        ALL_TICKER = ALL_TICKER[ALL_TICKER.Volume > ALL_TICKER.Volume.quantile(0.5)]
+        ALL_TICKER = ALL_TICKER[ALL_TICKER["Institutional Ownership"] > ALL_TICKER["Institutional Ownership"].quantile(0.5)]
+
+        ALL_TICKER = ALL_TICKER.Ticker.to_list()
+
+        today = datetime.today().date()
+        robinhood = robingateway()
+        trade_scale = "day"
+        backdays = 80
+
+
+        ## CP Id
+        START = 0
+        END = len(ALL_TICKER)
+        n_thread = 5
+        steps = int((END - START) / n_thread)
+        print("each length:%s" % steps)
+        pro = multiprocessing.get_context("fork")
+        with pro.Pool(n_thread) as pool:
+            pool.starmap(pair_screen,
+                         [(ALL_TICKER,start, start + steps) for start in range(START, END, steps)])
+
+        send_email("Finished screen for momentum trade")
+            
 
 if __name__ == "__main__":
 
-    # try:
-
-    mongod = mongo("all_symbol","screener")
-    ## This line gets the max refresh_date
-    tos = pd.DataFrame(mongod.conn.table.find({},{"Refresh_Date":1}).sort("Refresh_Date",-1).limit(1))["Refresh_Date"].iloc[0]
-    ALL_TICKER = pd.DataFrame(mongod.conn.table.find({"Refresh_Date":tos}))
+    main()
+   
 
 
-    # ## Initialization
-    # mongod.conn.conn.cursor().execute("truncate table all_symbol.pair_trade_sharp")
-    # mongod.conn.conn.cursor().execute("truncate table all_symbol.pair_trade_screen_save")
-    # mongod.conn.conn.commit()
-
-
-    # ALL_TICKER = pd.DataFrame(mongod.db["cantrade"].find()).Ticker.tolist()
-    result = pd.DataFrame()
-
-
-    ALL_TICKER = ALL_TICKER[ALL_TICKER.Volume > ALL_TICKER.Volume.quantile(0.5)]
-    ALL_TICKER = ALL_TICKER[ALL_TICKER["Institutional Ownership"] > ALL_TICKER["Institutional Ownership"].quantile(0.5)]
-
-    ALL_TICKER = ALL_TICKER.Ticker.to_list()
-
-    today = datetime.today().date()
-    robinhood = robingateway()
-    trade_scale = "day"
-    backdays = 80
-
-
-    ## CP Id
-    START = 0
-    END = len(ALL_TICKER)
-    n_thread = 5
-    steps = int((END - START) / n_thread)
-    print("each length:%s" % steps)
-    # pro = multiprocessing.get_context("spawn")
-    with multiprocessing.Pool(n_thread) as pool:
-        pool.starmap(pair_screen,
-                     [(start, start + steps) for start in range(START, END, steps)])
-
-    send_email("Finished screen for momentum trade")
-
-
-
-
-# except Exception as e:
-#     send_email("Error! screen for momentum trade: %s"%str(e))

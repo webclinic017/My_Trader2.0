@@ -1,8 +1,9 @@
 """
 toolset working with cboe data
-@author: Jev Kuznetsov
+@author: Jev Kuznetsov adjusted by Ken Li
 Licence: BSD
 """
+
 from .my_lib import *
 from .my_trader import *
 from selenium import webdriver as se
@@ -12,7 +13,9 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 class future ():
-
+    
+    
+    
 
     def monthCode(self, month):
         """ 
@@ -112,15 +115,17 @@ class future ():
 
         options = se.FirefoxOptions()
         options.add_argument("--headless")
-        driver = se.Firefox(executable_path=home_dir + "/notebook/My_Trader2.0/geckodriver", options=options)
+        driver = se.Remote(gecko_path, options=options)
 
         driver.set_window_size(2100, 4000)
 
         driver.get('https://www.cboe.com/delayed_quotes/vix')
         driver.implicitly_wait(5)
         try:
+            print("start the waiter and locate element")
             element = WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.LINK_TEXT, symbol)))
-        except:
+        except Exception as e: 
+            print(e)
             if month + 1 > 12:
                 symbol = "VX" + "/" + self.monthCode(month+1) + str(int(year)+1)
             else:
@@ -147,7 +152,7 @@ class future ():
         #     expiration_date = element.find_element_by_xpath(
         #         "//div[contains(text(),'" + symbol + "')]/ancestor::td[1]/following-sibling::td")
         result = expiration_date.text
-        driver.close()
+        driver.quit()
         return datetime.strptime(result,"%m/%d/%Y")
 
     def get_future_price(self,year,month,average = False):
@@ -171,13 +176,14 @@ class future ():
                 # soup = bs(page.content, "html.parser")
                 options = se.FirefoxOptions()
                 options.add_argument("--headless")
-                driver = se.Firefox(executable_path=home_dir + "notebook/My_Trader2.0/geckodriver",options=options)
+                driver = se.Remote(gecko_path,options=options)
 
                 driver.set_window_size(2100, 4000)
 
                 driver.get('https://www.cboe.com/delayed_quotes/vix')
                 driver.implicitly_wait(5)
                 try:
+                    print("get_future_price: start the waiter and locate element")
                     element = WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.LINK_TEXT, symbol)))
                 except:
                     if month + 1 > 12:
@@ -206,7 +212,7 @@ class future ():
                 # Last_Price = element.find_element_by_xpath(
                 #     "//div[contains(text(),'" + symbol + "')]/ancestor::td[1]/following-sibling::td/following-sibling::td")
                 result = Last_Price.text
-                driver.close()
+                driver.quit()
                 return float(result)
                 # if not average:
                 #     return float(soup.find( attrs= {"title":symbol}).find_next("span").find_next("span").text.split()[0])
@@ -216,6 +222,7 @@ class future ():
                 #     return (float(soup.find( attrs= {"title":symbol}).find_next("span").find_next("span").text.split()[0]) + float(soup.find( attrs= {"title":"VX" + monthCode(month+1)+year}).find_next("span").find_next("span").text.split()[0]))/2
             except Exception as e:
                 print (e)
+                driver.quit()
                 trial +=1
 
 """
@@ -239,7 +246,10 @@ class vix_dayroll_trade():
 
         my_future = future()
         ##Changed to use faward price 6/22/2020
-        day_roll = ((my_future.get_future_price(datetime.now().year,datetime.now().month) - fwd_price("^VIX",mat=3,val_num_steps=42))/my_future.get_historic_data(my_future.get_future_expiration(datetime.now().year,datetime.now().month)).Close.std())/30
+        future_price = my_future.get_future_price(datetime.now().year,datetime.now().month)
+        future_exp = my_future.get_future_expiration(datetime.now().year,datetime.now().month)
+        future_close_std = my_future.get_historic_data(future_exp).Close.std()
+        day_roll = (( future_price -fwd_price("^VIX",mat=3,val_num_steps=42))/future_close_std)/30
 
 #         return day_roll.values[0]
         return day_roll   ## returns float after 6/22/2020 change

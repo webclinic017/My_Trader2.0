@@ -9,7 +9,6 @@ import numpy as np
 from .Robinhood import Robinhood
 from pandas import *
 import xlrd
-import  talib as ta
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -35,7 +34,6 @@ from bs4 import BeautifulSoup as bs
 # from pandas_datareader import data as pdr
 # import pandas_datareader as da
 from tqdm import tqdm
-from IPython.display import clear_output
 # import backtrader as bt
 import urllib.request, urllib.error, urllib.parse
 # import datetools 
@@ -45,6 +43,7 @@ import sqlalchemy as sa
 from sqlalchemy import event
 from .fmp import *
 from .mysql import *
+import os
 
 ############################################
 
@@ -64,14 +63,24 @@ def read_json(filepath):
     read = "".join(read[0]).replace("\n"," ")
     return json.loads(read)
 
+if os.getcwd() == "/opt/airflow":
+    home_dir="/opt/airflow/"
+else:
+    home_dir = "/home/ken/airflowProd/"
 
-home_dir = "/home/ken/"
 
-#directory = "file/"
-directory = home_dir + "notebook/My_Trader2.0/file/"
+gecko_download_path = home_dir + "notebook/My_Trader/file/"
+gecko_path = "http://10.0.1.22:4444/wd/hub"
+
+# home_dir = "/home/ken/airflowProd/"
+# home_dir="/opt/airflow/"
+# home_dir=os.getcwd() + "/"
+
+# directory = home_dir + "file/"
+directory = home_dir + "notebook/My_Trader/file/"
 working_suggestion = "Trade_suggestion_minute_1st"
 universe_file_name = "my_universe_industry_sector_marketcap_earnings.csv"
-root_directory = home_dir + "notebook/My_Trader2.0/"
+root_directory = home_dir + "notebook/My_Trader/"
 
 
 ## Timezone
@@ -477,7 +486,7 @@ def get_price_data(tic_list,method,interval = "30min",robinhood= None,start_date
             except Exception as e:
                 print(("error occorded in getting historicals for ", i))
                 print((e,"\n"))
-                print((re.text))
+                # print((re.text))
                 error.append([i,'get_intraday'])
 #                 trial +=1
                 time.sleep(10)
@@ -843,7 +852,8 @@ finviz = finviz()
 #     print "done"
 
 #     '''
-gateway = home_dir + "notebook/My_Trader2.0/record-Copy1.txt"
+gateway = home_dir + "notebook/My_Trader/record-Copy1.txt"
+# gateway = home_dir + "record-Copy1.txt"
 
 #     industry_sector_earnings = pd.read_csv("file/my_universe_industry_sector_marketcap_earnings.csv")
 #     #earnings = pd.read_csv("my_universe_earnings.csv")
@@ -1443,7 +1453,7 @@ def readgateway(line):
 
 class connect_mongo:
     def __init__(self, coll_name, table = None):
-        self.client = pymongo.MongoClient('mongodb://localhost:27000',tz_aware=True)
+        self.client = pymongo.MongoClient('mongodb://10.0.1.22:27017',tz_aware=True)
         self.db = self.client[coll_name]
         if table is not None:
             self.table = self.db[table]

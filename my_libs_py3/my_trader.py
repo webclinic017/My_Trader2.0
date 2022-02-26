@@ -242,7 +242,6 @@ def hedge(ticker,robinhood,method = "self_minute",hedge_int = "VIXY",target_beta
     position_beta = beta([ticker],interval ="minute",robinhood=robinhood)[0].iloc[0][0]
     position_value = realtimequote(ticker).price.iloc[0]
     shares = np.ceil(position_value*(target_beta-position_beta)/hedge_int_beta/hedge_int_price)
-    clear_output()
     return ("To headge %s beta to "%ticker + str(target_beta) + " please trade " + str(shares) + " share of " +str(hedge_int) + "<br>" + "Total Beta is {:1.4f}".format(position_beta))\
             ,shares
 
@@ -746,7 +745,6 @@ class get_robinhood:
         position_beta = self.get_protfolio(stocks, quantity,interval = method)[1]
         position_value = float(self.my_trader.portfolios()["last_core_equity"])
         shares = np.floor(position_value*(target_beta-position_beta)/hedge_int_beta/hedge_int_price)
-        clear_output()
         return ("To headge the position beta to " + str(target_beta) + " please trade " + str(shares) + " share of " +str(hedge_int) + "<br>" + "Total Beta is {:1.4f}".format(position_beta),shares)
     
     def hedge_addup(self,interval ="minute",hedge_int = "VIXY",target_beta =0.0):
@@ -762,7 +760,6 @@ class get_robinhood:
         position_beta = position_beta.Weighted_beta.sum()
         position_value = float(self.my_trader.portfolios()["last_core_equity"])
         shares = np.floor(position_value*(target_beta-position_beta)/hedge_int_beta/hedge_int_price)
-        clear_output()
         return ("To headge the position beta to " + str(target_beta) + " please trade " + str(shares) + " share of " +str(hedge_int) + "<br>" + "Total Beta is {:1.4f}".format(position_beta))
         
         #return shares  

@@ -1,4 +1,4 @@
-from my_libs_py3 import *
+from .my_libs_py3 import *
 
 TRADE_CASH = 500
 
@@ -133,28 +133,32 @@ def pair_trade_top():
                                                   "Avg_Return":{"$gt":top_return}}).sort("Sharp_Ratio",-1).limit(10))
     return candid
 
-# buy check
-candid = pair_trade_top()
 
-for ticker1, ticker2 in zip(candid.Ticker_1,candid.Ticker_2):
-    pair_trade_action(ticker1,ticker2,cash=TRADE_CASH)
 
 
 #TODO
 # sell check
 
 ## position adjustment
-pos = get_pair_open_opsition()
-for p in pos:
-    p_log = get_pair_trade_log(p)
-    ticker1 = p_log.loc[0,"Ticker1"]
-    ticker2 = p_log.loc[0, "Ticker2"]
-    # current_size1 = p_log.loc[0,"size1"]
-    # current_size2 = p_log.loc[0, "size2"]
-    # today_trade = self_pair_trade(ticker1, ticker2, method="realtimeday", cash=500).iloc[-1]
-    # size1 = today_trade["size1"]
-    # size2 = today_trade["size2"]
-    # if size1 == 0:
-    #     trade_size1 = 0 - current_size1
-    #     trade_size2 = 0 - current_size2
-    pair_trade_action(ticker1, ticker2, close_action=True)
+def pair_trade_action_main():
+    
+    # buy check
+    candid = pair_trade_top()
+
+    for ticker1, ticker2 in zip(candid.Ticker_1,candid.Ticker_2):
+        pair_trade_action(ticker1,ticker2,cash=TRADE_CASH)
+
+    pos = get_pair_open_opsition()
+    for p in pos:
+        p_log = get_pair_trade_log(p)
+        ticker1 = p_log.loc[0,"Ticker1"]
+        ticker2 = p_log.loc[0, "Ticker2"]
+        # current_size1 = p_log.loc[0,"size1"]
+        # current_size2 = p_log.loc[0, "size2"]
+        # today_trade = self_pair_trade(ticker1, ticker2, method="realtimeday", cash=500).iloc[-1]
+        # size1 = today_trade["size1"]
+        # size2 = today_trade["size2"]
+        # if size1 == 0:
+        #     trade_size1 = 0 - current_size1
+        #     trade_size2 = 0 - current_size2
+        pair_trade_action(ticker1, ticker2, close_action=True)
