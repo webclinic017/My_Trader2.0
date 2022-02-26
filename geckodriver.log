@@ -11520,3 +11520,88 @@ JavaScript warning: https://pagead2.googlesyndication.com/bg/6ARyktE4tPRvvoSTtP7
 Exiting due to channel error.
 Exiting due to channel error.
 Exiting due to channel error.
+1633467908342	geckodriver	INFO	Listening on 127.0.0.1:50085
+1633467909396	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileYWxjdD"
+*** You are running in headless mode.
+[GFX1-]: glxtest: Unable to open a connection to the X server
+[GFX1-]: glxtest: eglCreateContext returned an error
+1633467913642	Marionette	INFO	Marionette enabled
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileYWxjdD/search.json.mozlz4", (void 0)))
+1633467927319	Marionette	INFO	Listening on port 42585
+1633467927531	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+1633468077223	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://remote/content/marionette/sync.js:238:19
+TimedPromise@chrome://remote/content/marionette/sync.js:223:10
+interaction.flushEventLoop@chrome://remote/content/marionette/interaction.js:431:10
+webdriverClickElement@chrome://remote/content/marionette/interaction.js:179:31
+1633468092550	geckodriver	INFO	Listening on 127.0.0.1:48893
+1633468093874	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofilesChVFa"
+*** You are running in headless mode.
+
+(firefox:19346): GLib-GObject-CRITICAL **: 14:08:15.149: g_object_get: assertion 'G_IS_OBJECT (object)' failed
+[GFX1-]: glxtest: Unable to open a connection to the X server
+[GFX1-]: glxtest: eglCreateContext returned an error
+1633468100425	Marionette	INFO	Marionette enabled
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofilesChVFa/search.json.mozlz4", (void 0)))
+1633468112555	Marionette	INFO	Listening on port 35701
+1633468112835	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+1633468290699	Marionette	WARN	TimedPromise timed out after 500 ms: stacktrace:
+TimedPromise/<@chrome://remote/content/marionette/sync.js:238:19
+TimedPromise@chrome://remote/content/marionette/sync.js:223:10
+interaction.flushEventLoop@chrome://remote/content/marionette/interaction.js:431:10
+webdriverClickElement@chrome://remote/content/marionette/interaction.js:179:31
+console.log: WebExtensions: reset-default-search: starting.
+console.log: WebExtensions: reset-default-search: No addons in our list are installed.
+
+(firefox:20598): GLib-GObject-CRITICAL **: 14:12:02.249: g_object_get: assertion 'G_IS_OBJECT (object)' failed
+1633468354123	Marionette	INFO	Stopped listening on port 35701
+JavaScript error: resource:///modules/Interactions.jsm, line 230: NS_ERROR_FAILURE: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIUserIdleService.removeIdleObserver]
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Child][RunMessage] Error: Channel closing: too late to send/recv, messages will be lost
+
+
+###!!! [Parent][MessageChannel] Error: (msgtype=0x390077,name=PContent::Msg_DestroyBrowsingContextGroup) Closed channel: cannot send/recv
+
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
+1633548870123	geckodriver	INFO	Listening on 127.0.0.1:38179
+1633548870140	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileXDdp0f"
+*** You are running in headless mode.
+[GFX1-]: glxtest: Unable to open a connection to the X server
+[GFX1-]: glxtest: eglCreateContext returned an error
+1633548870728	Marionette	INFO	Marionette enabled
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileXDdp0f/search.json.mozlz4", (void 0)))
+1633548873682	Marionette	INFO	Listening on port 39051
+1633548873854	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+
+(firefox:14651): GLib-GObject-CRITICAL **: 12:35:23.502: g_object_get: assertion 'G_IS_OBJECT (object)' failed
+1633548935051	Marionette	INFO	Stopped listening on port 39051
+JavaScript error: resource:///modules/Interactions.jsm, line 230: NS_ERROR_FAILURE: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIUserIdleService.removeIdleObserver]
+1633586508011	geckodriver	INFO	Listening on 127.0.0.1:48229
+1633586509019	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "--marionette" "--headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofileVQVXfm"
+*** You are running in headless mode.
+[GFX1-]: glxtest: Unable to open a connection to the X server
+[GFX1-]: glxtest: eglCreateContext returned an error
+1633586514417	Marionette	INFO	Marionette enabled
+[GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new NotFoundError("Could not open the file at /tmp/rust_mozprofileVQVXfm/search.json.mozlz4", (void 0)))
+1633586525889	Marionette	INFO	Listening on port 36127
+1633586526149	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+1633586603278	Marionette	WARN	Ignoring event 'DOMContentLoaded' because document has an invalid readyState of 'complete'.
+JavaScript error: , line 0: TypeError: NetworkError when attempting to fetch resource.
+JavaScript error: https://tpc.googlesyndication.com/sodar/Enqz_20U.html, line 11: uncaught exception: 7
+IPDL protocol error: Handler returned error code!
+
+###!!! [Parent][DispatchAsyncMessage] Error: PMessagePort::Msg_PostMessages Processing error: message was deserialized, but the handler returned false (indicating failure)
+
+
+(firefox:15592): GLib-GObject-CRITICAL **: 23:06:10.223: g_object_get: assertion 'G_IS_OBJECT (object)' failed
+1633586816474	Marionette	INFO	Stopped listening on port 36127
+JavaScript error: resource:///modules/Interactions.jsm, line 230: NS_ERROR_FAILURE: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIUserIdleService.removeIdleObserver]

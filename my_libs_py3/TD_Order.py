@@ -1,5 +1,5 @@
-from my_libs_py3.tdameritrade import *
-from my_libs_py3.my_lib import *
+from .tdameritrade import *
+from .my_lib import *
 
 account_id = 277216702
 client  = TDClient(client_id="QV4XBB76GOYNVORVOBPMN3PKZFURM0VZ",refresh_token=readgateway(7),account_ids=[str(account_id)])
