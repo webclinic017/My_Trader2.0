@@ -35,7 +35,7 @@ def pair_trade_action(ticker1,ticker2,cash=TRADE_CASH,close_action=False):
     try:
         td_trade = order_equity(order_type.LIMIT)
 
-        ## need to trade the short sell first to test whether it's short
+        ## need to trade the short sell first to test whether it's shortable or not
         ## check signal
         if (trade_size1 != 0 or trade_size2 != 0) and (now_cash>TRADE_CASH or close_action):
             send_email("",title="!Important! Pair Trade Order Placing for %s and %s"%(ticker1,ticker2))
@@ -135,30 +135,57 @@ def pair_trade_top():
 
 
 
+def flat_position_by_days(ticker1,ticker2,days=7):
+    try:
+        tradeLog = mongo("pair_trade_log", f"{ticker1}_{ticker2}")
+        myLog = pd.DataFrame(tradeLog.conn.table.find())
+        ## It's negative here
+        total_size1 = -myLog["size1"].sum()
+        total_size2 = -myLog["size2"].sum()
 
-#TODO
-# sell check
+        lastTrade = myLog.sort_values("TimeStamp", ascending=False).iloc[-1]["TimeStamp"]
 
-## position adjustment
+        td_trade = order_equity(order_type.LIMIT)
+        if datetime.now(tz=lastTrade.tz)-lastTrade > timedelta(days=days):
+            orderid = td_trade.place(ticker1, total_size1)
+            if get_order_by_id(orderid)["status"] != "REJECTED":
+                time.sleep(60)
+                # if get_order_by_id(orderid)["status"] == "FILLED":
+                orderid = td_trade.place(ticker2, total_size2)
+                if get_order_by_id(orderid)["status"] != "REJECTED":
+                    send_email("Trade process done.",
+                               title="!Important! Pair Trade flat action Order Placed for %s and %s" % (ticker1, ticker2))
+            else:
+                if not cancel_order(orderid):
+                    send_email("Please manually cancel order for %s for flat action",
+                               title="!Important! Cancel Order Failed" % orderid)
+                raise Exception("{ticker2} short not filled for \
+                        {ticker1} and {ticker2} for a flat action".format(ticker1=ticker1,ticker2=ticker2))
+            log_pair_trade(myLog.iloc[0].Ticker1, myLog.iloc[0].Ticker2,total_size1 , total_size2, None,
+                   None)
+            return "flatted"
+    except Exception as e:
+        send_email(str(e),
+                   title="!Important! Pair Trade Place Order Error for {ticker1} and {ticker2}".format(ticker1=ticker1,
+                                                                                                   ticker2=ticker2))
+
+
+
 def pair_trade_action_main():
-    
+    # sell check, sell if hold more than 7 days
+
+
+
     # buy check
     candid = pair_trade_top()
 
     for ticker1, ticker2 in zip(candid.Ticker_1,candid.Ticker_2):
         pair_trade_action(ticker1,ticker2,cash=TRADE_CASH)
-
+    ## position adjustment
     pos = get_pair_open_opsition()
     for p in pos:
         p_log = get_pair_trade_log(p)
         ticker1 = p_log.loc[0,"Ticker1"]
-        ticker2 = p_log.loc[0, "Ticker2"]
-        # current_size1 = p_log.loc[0,"size1"]
-        # current_size2 = p_log.loc[0, "size2"]
-        # today_trade = self_pair_trade(ticker1, ticker2, method="realtimeday", cash=500).iloc[-1]
-        # size1 = today_trade["size1"]
-        # size2 = today_trade["size2"]
-        # if size1 == 0:
-        #     trade_size1 = 0 - current_size1
-        #     trade_size2 = 0 - current_size2
-        pair_trade_action(ticker1, ticker2, close_action=True)
+        ticker2 = p_log.loc[0,"Ticker2"]
+        if flat_position_by_days(ticker1,ticker2) != "flatted":
+            pair_trade_action(ticker1, ticker2, close_action=True)

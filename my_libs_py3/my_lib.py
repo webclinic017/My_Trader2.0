@@ -1905,7 +1905,7 @@ class mongo:
             self.stock_list = "cantrade.csv"
             self.ETF_list = "ETFList.csv"
             self.initiate_list = [self.stock_list,self.ETF_list]
-            print ("Connection Successful")
+            # print ("Connection Successful")
         except:
             print ("Connection Failed")
 
