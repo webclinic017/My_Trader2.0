@@ -130,7 +130,7 @@ def pair_trade_top():
 
     candid = pd.DataFrame(mongod.conn.table.find({"End_Value":{"$gt":TRADE_CASH},
                                                   "Sharp_Ratio":{"$gt":top_sharp},
-                                                  "Avg_Return":{"$gt":top_return}}).sort("Sharp_Ratio",-1).limit(10))
+                                                  "Avg_Return":{"$gt":top_return}}).sort("Sharp_Ratio",-1).limit(20))
     return candid
 
 
