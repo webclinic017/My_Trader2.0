@@ -77,7 +77,7 @@ def fix_unsettled_trade_update(ticker, size=0, partial=False):
     if not partial:
         mongod = mongo("trade_log",ticker)
         
-        mongod.conn.table.update({"TimeStamp":ID},{"$set":{"size":0}})
+        mongod.conn.table.update_one({"TimeStamp":ID},{"$set":{"size":0}})
         
 
            
@@ -86,7 +86,7 @@ def fix_unsettled_trade_update(ticker, size=0, partial=False):
     else:
         mongod = mongo("trade_log",ticker)
         
-        mongod.conn.table.update({"TimeStamp":ID},{"$set":{"size":size}})
+        mongod.conn.table.update_one({"TimeStamp":ID},{"$set":{"size":size}})
 
     
     

@@ -143,7 +143,7 @@ def flat_position_by_days(ticker1,ticker2,days=7):
         total_size1 = -myLog["size1"].sum()
         total_size2 = -myLog["size2"].sum()
 
-        lastTrade = myLog.sort_values("TimeStamp", ascending=False).iloc[-1]["TimeStamp"]
+        lastTrade = myLog.sort_values("TimeStamp", ascending=True).iloc[-1]["TimeStamp"]
 
         td_trade = order_equity(order_type.LIMIT)
         if datetime.now(tz=lastTrade.tz)-lastTrade > timedelta(days=days):
